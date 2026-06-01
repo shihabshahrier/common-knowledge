@@ -57,8 +57,11 @@ MATCH_COUNT=0
 while IFS= read -r line; do
   MATCH_COUNT=$((MATCH_COUNT + 1))
 
+  # Extract the file path (everything before the first colon)
+  FILEPATH="${line%%:*}"
+  
   # Extract project slug from path: $CK_HOME/<project>/...
-  REL_PATH="${line#"$CK_HOME/"}"
+  REL_PATH="${FILEPATH#"$CK_HOME/"}"
   PROJECT="${REL_PATH%%/*}"
 
   # If it's a file at the root (like README.md), treat it as a root-level match
