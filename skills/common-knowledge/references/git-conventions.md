@@ -49,9 +49,9 @@ feat(project-slug): save session context [schema, api]
 | `docs` | Updating documentation (codebase map, README, decisions) |
 | `chore` | Maintenance (sync, progress log, index update, meta.json update) |
 | `fix` | Correcting incorrect knowledge (wrong schema, outdated endpoint) |
-| `link` | Recording a cross-project connection |
 | `refactor` | Restructuring knowledge files without changing content |
-| `init` | First commit when creating the store |
+
+> **Note:** Link commits use `feat` (e.g. `feat: link a <-> b [type]`). Init commit uses `chore` (`chore: initialize common-knowledge store`).
 
 ---
 

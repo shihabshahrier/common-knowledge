@@ -48,7 +48,9 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
 3. If `CK_HOME` directory does not exist AND command is not `init` → run Phase 1 first, then continue.
 4. Route:
    - `init` → Phase 1
-   - `save`, `map`, `schema`, `progress`, `link` → Phase 3
+   - `save`, `map`, `schema`, `progress` (without project slug, or with `--auto`) → Phase 2, then Phase 3
+   - `save`, `map`, `schema`, `progress` (with explicit project slug) → Phase 3
+   - `link` → Phase 3E (both project slugs required; if missing, prompt)
    - `load` → Phase 4
    - `status` → Phase 5
    - `search` → Phase 6
@@ -127,7 +129,7 @@ Write to the appropriate files under `$CK_HOME/<project>/`:
 - General decisions → `decisions.md`
 - Build progress → `progress.md` (append with timestamp)
 - Architecture info → `codebase-map.md`
-- Use `--section` to target: `schema`, `api`, `frontend`, `infra`, `workers`
+- Use `--section` to target: `schema` (or `db`), `api`, `frontend`, `infra`, `workers`
 
 Update `meta.json` field `last_updated` to current UTC time.
 
@@ -170,7 +172,8 @@ Append a new timestamped entry to `$CK_HOME/<project>/progress.md`.
    ```
 3. Mirror entry in `$CK_HOME/<project-b>/connections.md`.
 4. Append summary to `$CK_HOME/_global/integrations.md`.
-5. Commit: `"feat: link <project-a> <-> <project-b> [<type>]"`
+5. Update `meta.json.related_projects` for both projects: add the other project's slug if not already present.
+6. Commit: `"feat: link <project-a> <-> <project-b> [<type>]"`
 
 ---
 
@@ -184,9 +187,10 @@ Append a new timestamped entry to `$CK_HOME/<project>/progress.md`.
    - `decisions.md`
    - `connections.md`
    - `schema/db.md` (if `--section schema` or `--section db`)
-   - `api/endpoints.md` (if `--section api`)
+   - `api/endpoints.md` (if `--section api` or `--section schema`)
    - `frontend/components.md` (if `--section frontend`)
    - `infra/overview.md` (if `--section infra`)
+   - `workers/overview.md` (if `--section workers`)
 3. Output: a structured summary of everything loaded.
 4. Print: "Local path: {local_path}" and "Repo: {origin_repo}" so the agent knows where to find code.
 

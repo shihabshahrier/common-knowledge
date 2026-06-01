@@ -109,7 +109,7 @@ $env:CK_HOME = "C:\path\to\knowledge-store"
 | `origin_repo` | string | ⚠️ | Git remote URL. Use `""` if no remote exists |
 | `local_path` | string | ⚠️ | Absolute path on this machine. Use `""` if not applicable |
 | `tech_stack` | array of strings | ✅ | Technologies used. Empty array `[]` if unknown |
-| `related_projects` | array of strings | ✅ | Slugs of connected projects. Empty array `[]` if none |
+| `related_projects` | array of strings | ✅ | Slugs of connected projects (quick-ref cache — authoritative source is `connections.md`). Auto-updated by `/ck link`. Empty `[]` if none |
 | `last_updated` | string | ✅ | ISO 8601 UTC datetime. Update on every write. |
 | `description` | string | ✅ | One sentence. What is this project? |
 

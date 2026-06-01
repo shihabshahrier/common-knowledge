@@ -133,6 +133,7 @@ common-knowledge/               ← This skill repo
 | macOS | `$HOME/common-knowledge` | `export CK_HOME=/custom/path` |
 | Linux | `$HOME/common-knowledge` | `export CK_HOME=/custom/path` |
 | Windows (PS) | `$env:USERPROFILE\common-knowledge` | `$env:CK_HOME = "C:\custom"` |
+| Windows (CMD) | `%USERPROFILE%\common-knowledge` | `set CK_HOME=C:\custom` |
 
 ---
 

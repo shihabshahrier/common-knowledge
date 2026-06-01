@@ -43,6 +43,7 @@ Installs to all major AI agent paths automatically:
 - `~/.config/opencode/skills/` (opencode)
 - `~/.gemini/antigravity/skills/` (Gemini CLI)
 - `~/.gemini/config/skills/` (Antigravity IDE)
+- `~/.openclaw/workspace/skills/` (OpenClaw)
 
 ## Usage
 

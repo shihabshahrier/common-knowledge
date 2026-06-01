@@ -52,7 +52,7 @@ Replace all `{PLACEHOLDER}` values before writing.
 
 ## codebase-map.md
 
-```markdown
+````markdown
 # Codebase Map — {Project Name}
 
 > Last updated: {YYYY-MM-DD}
@@ -101,7 +101,7 @@ Replace all `{PLACEHOLDER}` values before writing.
 ## Module Boundaries
 
 {Description of how the codebase is organized into modules/packages/layers.}
-```
+````
 
 ---
 
@@ -183,7 +183,7 @@ Cross-project links and integration points.
 
 ## schema/db.md
 
-```markdown
+````markdown
 # Database Schema — {Project Name}
 
 > Last updated: {YYYY-MM-DD}
@@ -226,13 +226,13 @@ CREATE INDEX {index_name} ON {table_name} ({column});
 -- {Description of what this query does}
 SELECT ... FROM ... WHERE ...;
 ```
-```
+````
 
 ---
 
 ## api/endpoints.md
 
-```markdown
+````markdown
 # API Endpoints — {Project Name}
 
 > Last updated: {YYYY-MM-DD}
@@ -282,13 +282,13 @@ curl -H "Authorization: Bearer {token}" {BASE_URL}/v1/resource
 | 404 | {not found description} |
 
 ---
-```
+````
 
 ---
 
 ## frontend/components.md
 
-```markdown
+````markdown
 # Frontend Architecture — {Project Name}
 
 > Last updated: {YYYY-MM-DD}
@@ -324,13 +324,13 @@ npm install
 npm run dev       # local dev
 npm run build     # production bundle
 ```
-```
+````
 
 ---
 
 ## infra/overview.md
 
-```markdown
+````markdown
 # Infrastructure Overview — {Project Name}
 
 > Last updated: {YYYY-MM-DD}
@@ -366,7 +366,7 @@ npm run build     # production bundle
 ## CI/CD
 
 {Describe CI/CD pipeline — GitHub Actions, branches, what triggers deploy.}
-```
+````
 
 ---
 
@@ -433,7 +433,7 @@ Architecture and technology decisions that span multiple projects.
 
 ## _global/agent-config.md
 
-```markdown
+````markdown
 # AI Agent Configuration
 
 Notes on AI agent setup, model preferences, and environment config.
@@ -461,7 +461,7 @@ export CK_HOME="$HOME/common-knowledge"
 ## Agent Notes
 
 {Any notes about how to configure specific agents, MCP servers, skill locations, etc.}
-```
+````
 
 ---
 

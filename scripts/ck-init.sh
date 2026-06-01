@@ -20,7 +20,7 @@ echo ""
 # ─── Create directory tree ─────────────────────────────────────────────────────
 mkdir -p "$CK_HOME/_global"
 
-# ─── .gitignore ────────────────────────────────────────────────────────────────
+# ─── .gitignore (always regenerated — config file) ─────────────────────────────
 cat > "$CK_HOME/.gitignore" << 'EOF'
 .DS_Store
 Thumbs.db
@@ -31,8 +31,20 @@ Thumbs.db
 .env.local
 EOF
 
-# ─── _global stubs ─────────────────────────────────────────────────────────────
-cat > "$CK_HOME/_global/agent-config.md" << 'EOF'
+# ─── .gitattributes (cross-platform line endings) ─────────────────────────────
+if [[ ! -f "$CK_HOME/.gitattributes" ]]; then
+  cat > "$CK_HOME/.gitattributes" << 'EOF'
+* text=auto eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.sql text eol=lf
+*.yaml text eol=lf
+EOF
+fi
+
+# ─── _global stubs (only create if missing — never overwrite user edits) ──────
+if [[ ! -f "$CK_HOME/_global/agent-config.md" ]]; then
+  cat > "$CK_HOME/_global/agent-config.md" << 'EOF'
 # AI Agent Configuration
 
 Notes on AI agent setup, model preferences, and environment config.
@@ -59,8 +71,10 @@ export CK_HOME="$HOME/common-knowledge"
 
 <!-- Add notes about agent configuration, MCP servers, skill paths, etc. -->
 EOF
+fi
 
-cat > "$CK_HOME/_global/tech-decisions.md" << 'EOF'
+if [[ ! -f "$CK_HOME/_global/tech-decisions.md" ]]; then
+  cat > "$CK_HOME/_global/tech-decisions.md" << 'EOF'
 # Global Technology Decisions
 
 Architecture and technology decisions that span multiple projects.
@@ -69,8 +83,10 @@ Architecture and technology decisions that span multiple projects.
 |------|----------|------------------|-----------|
 |      |          |                  |           |
 EOF
+fi
 
-cat > "$CK_HOME/_global/integrations.md" << 'EOF'
+if [[ ! -f "$CK_HOME/_global/integrations.md" ]]; then
+  cat > "$CK_HOME/_global/integrations.md" << 'EOF'
 # Cross-Project Integrations
 
 Global map of all known project connections.
@@ -78,6 +94,7 @@ This file is updated automatically by `/ck link`.
 
 <!-- Entries appended below by the common-knowledge skill -->
 EOF
+fi
 
 # ─── Root README (index, auto-generated) ───────────────────────────────────────
 TIMESTAMP=$(date -u "+%Y-%m-%d %H:%M UTC" 2>/dev/null || echo "unknown")
