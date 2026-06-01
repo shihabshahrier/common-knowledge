@@ -61,6 +61,11 @@ while IFS= read -r line; do
   REL_PATH="${line#"$CK_HOME/"}"
   PROJECT="${REL_PATH%%/*}"
 
+  # If it's a file at the root (like README.md), treat it as a root-level match
+  if [[ "$PROJECT" == "$REL_PATH" ]] || [[ "$PROJECT" == *.md ]] || [[ "$PROJECT" == *.json ]]; then
+    PROJECT="(root)"
+  fi
+
   # Print project header when project changes
   if [[ "$PROJECT" != "$CURRENT_PROJECT" ]]; then
     [[ -n "$CURRENT_PROJECT" ]] && echo ""
@@ -68,6 +73,8 @@ while IFS= read -r line; do
 
     if [[ "$PROJECT" == "_global" ]]; then
       echo "📁 _global (cross-project knowledge)"
+    elif [[ "$PROJECT" == "(root)" ]]; then
+      echo "📁 / (store root)"
     else
       echo "📁 $PROJECT"
       # Show description from meta.json if available (pure bash, no python)
