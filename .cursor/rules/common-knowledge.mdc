@@ -1,0 +1,30 @@
+---
+description: Maintain a Git-backed local knowledge store across all your projects and AI agents.
+globs:
+alwaysApply: false
+---
+
+# common-knowledge skill
+
+Invocation: `/ck <command> [project]` or `/common-knowledge <command> [project]`
+
+## Commands
+- `init` — Create and initialize the knowledge store at ~/common-knowledge
+- `save <project> [--section <area>] [--auto]` — Save current context to a project
+- `load <project> [--section <area>]` — Load all knowledge for a project
+- `map <project>` — Generate/update codebase map
+- `schema <project>` — Save DB schema or API spec
+- `progress <project>` — Append timestamped progress entry
+- `link <a> <b> [--type <rel>]` — Record cross-project connection
+- `status` — List all tracked projects
+- `search <query>` — Full-text search across the store
+- `sync` — Git commit all pending changes
+
+## Key Rules
+- Store location: `$CK_HOME` (default: `~/common-knowledge` on macOS/Linux)
+- Every write is a git commit with a descriptive message
+- `progress.md` and `connections.md` are append-only — never overwrite
+- `meta.json` must always be valid JSON
+- Use `--auto` to auto-detect project from cwd
+
+Full skill: see `skills/common-knowledge/SKILL.md`

@@ -1,0 +1,6 @@
+{
+  "name": "common-knowledge",
+  "description": "Maintain a Git-backed local knowledge store across all your projects and AI agents.",
+  "version": "1.0.0",
+  "contextFileName": "GEMINI.md"
+}

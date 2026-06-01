@@ -1,0 +1,17 @@
+[skill]
+name = "common-knowledge"
+description = "Maintain a Git-backed local knowledge store across all your projects and AI agents."
+version = "1.0.0"
+invocation = "/ck"
+
+[skill.commands]
+init = "Create and initialize the knowledge store"
+save = "Save current context to a project"
+load = "Load all knowledge for a project"
+map = "Generate/update codebase map"
+schema = "Save DB schema or API spec"
+progress = "Append timestamped progress entry"
+link = "Record cross-project connection"
+status = "List all tracked projects"
+search = "Full-text search across the store"
+sync = "Git commit all pending changes"

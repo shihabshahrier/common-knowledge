@@ -1,0 +1,5 @@
+interface:
+  display_name: "Common Knowledge"
+  short_description: "Maintain a Git-backed local knowledge store across all your projects and AI agents."
+policy:
+  allow_implicit_invocation: false

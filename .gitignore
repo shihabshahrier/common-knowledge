@@ -1,0 +1,10 @@
+# Skill repo ignores
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.local
+**/.DS_Store
+Thumbs.db
+*.tmp
