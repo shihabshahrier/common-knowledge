@@ -1,7 +1,7 @@
 # common-knowledge — Agent Guide
 
 > **Last updated:** 2026-06-02
-> **Status:** v1.0 — Initial Build Complete
+> **Status:** v1.0.1 — Hardened (scripts bundled, drift removed)
 > **Repo:** https://github.com/shihabshahrier/common-knowledge
 > **Author:** shihabshahrier
 
@@ -42,8 +42,8 @@ this repo (skill code)          knowledge store (data, separate)
 ├── skills/                     ├── .git/
 │   └── common-knowledge/       ├── README.md          ← auto-index
 │       ├── SKILL.md            ├── _global/
-│       └── references/         │   ├── agent-config.md
-├── scripts/                    │   ├── tech-decisions.md
+│       ├── references/         │   ├── agent-config.md
+│       └── scripts/            │   ├── tech-decisions.md
 ├── install.sh                  │   └── integrations.md
 └── agent.md  ← THIS FILE       └── {project-slug}/
                                     ├── meta.json
@@ -70,13 +70,13 @@ common-knowledge/               ← This skill repo
 ├── skills/
 │   └── common-knowledge/
 │       ├── SKILL.md           ← SOURCE OF TRUTH for the skill
-│       └── references/
-│           ├── store-layout.md      ← File tree + meta.json schema
-│           ├── git-conventions.md   ← Commit message format
-│           └── section-templates.md ← Markdown templates
-├── scripts/
-│   ├── ck-init.sh             ← Bash: initialize the store
-│   └── ck-search.sh           ← Bash: cross-store grep
+│       ├── references/
+│       │   ├── store-layout.md      ← File tree + meta.json schema
+│       │   ├── git-conventions.md   ← Commit message format
+│       │   └── section-templates.md ← Markdown templates
+│       └── scripts/           ← Bundled — ship with the skill via install.sh
+│           ├── ck-init.sh     ← Bash: deterministic store init (Phase 1)
+│           └── ck-search.sh   ← Bash: cross-store grep (Phase 6)
 ├── install.sh                 ← Install to all agent paths
 ├── agents/
 │   └── openai.yaml            ← Codex display config
@@ -147,6 +147,13 @@ common-knowledge/               ← This skill repo
 - [x] `scripts/ck-init.sh` — bash init helper
 - [x] `scripts/ck-search.sh` — bash search helper
 - [x] `install.sh` — installs to 6 agent paths
+
+### v1.0.1 — Hardening ✅ 2026-06-02
+- [x] Moved `scripts/` into `skills/common-knowledge/scripts/` so they ship with `install.sh` (were orphaned at repo root, never installed).
+- [x] `SKILL.md` Phase 1 / Phase 6 now call the bundled scripts; inline bash kept as fallback and aligned to match (no drift).
+- [x] Hardened inline search: `-F` fixed-string, `--exclude-dir=.git`, `.yml`, 50-cap.
+- [x] `last_updated` now bumped on every Phase 3 write (was save-only).
+- [x] Fixed Phase 4 load coupling (`schema` section no longer pulls `api/endpoints.md`).
 - [x] `agents/openai.yaml` — Codex config
 - [x] `.claude-plugin/plugin.json`
 - [x] `.cursor/rules/common-knowledge.mdc`
