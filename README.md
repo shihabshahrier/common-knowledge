@@ -1,15 +1,15 @@
-# common-knowledge
+# common-knowledge: Git-Backed AI Agent Memory
 
-> A Git-backed local knowledge store for every AI agent, codebase, and session.
+> A local, version-controlled knowledge base and persistent memory storage for AI agents, developers, and codebases.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Open%20Standard-blue)](https://github.com/agent-skills)
 
 ## What It Does
 
-`common-knowledge` is an AI agent skill that creates and maintains a **structured, Git-versioned
-knowledge store** at `~/common-knowledge/`. Every AI agent session, every codebase, every decision
-gets saved in one place — readable by any agent, any tool, any human.
+`common-knowledge` is an open-source AI agent skill that creates and maintains a **structured, Git-versioned local knowledge base** at `~/common-knowledge/`. It solves the "amnesia" problem for autonomous agents by providing **persistent long-term memory** across sessions. 
+
+Instead of relying on complex vector databases (Vectorless RAG), every AI agent session, architecture decision, API contract, and codebase map gets saved as plain Markdown and JSON in one centralized, offline-first location. It is readable by any agent (Claude Code, opencode, Cursor), any tool, and any human.
 
 ```
 ~/common-knowledge/
