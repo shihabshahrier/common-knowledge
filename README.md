@@ -62,6 +62,7 @@ Installs to all major AI agent paths automatically:
 | `/ck learn "<text>" [project]` | Capture a gotcha/pattern/pitfall/insight/idea |
 | `/ck learnings [project]` | Recall saved learnings into context |
 | `/ck ingest <file> [project]` | Extract a PDF/CSV/DOCX/PPTX/XLSX and distill it into the store |
+| `/ck brief <project>` | Regenerate the always-loaded warm core (`brief.md`) |
 | `/ck status` | List all tracked projects |
 | `/ck search <query>` | Full-text search across the store |
 | `/ck sync` | Git commit all pending changes |

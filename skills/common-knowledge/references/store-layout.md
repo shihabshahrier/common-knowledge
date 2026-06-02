@@ -33,6 +33,8 @@ $CK_HOME/                             ← Git root (e.g. ~/common-knowledge)
 │
 └── {project-slug}/                   ← One directory per project (kebab-case slug)
     ├── meta.json                     ← Machine-readable project metadata (REQUIRED)
+    ├── brief.md                      ← Curated warm core — loaded FIRST (≤1 screen)
+    ├── index.json                    ← Manifest: id/summary/tags/importance per entry
     ├── README.md                     ← Human-readable overview (auto-generated summary)
     ├── codebase-map.md               ← Project structure, entry points, key files
     ├── progress.md                   ← Append-only session log + implementation status
@@ -183,6 +185,8 @@ Description: Marketing automation and indexing platform.
 | Directory/File | Read by | Written by | Notes |
 |----------------|---------|------------|-------|
 | `meta.json` | Agents (machine) | `/ck save`, `/ck init` | Always valid JSON. Never nested. |
+| `brief.md` | Agents | `/ck save`, `/ck brief` | Always-loaded warm core. Overwrite on refresh. ≤1 screen. |
+| `index.json` | Agents (machine) | `/ck save/learn/ingest` | Manifest for triage. Upsert by `id` via `ck-index.sh`. Valid JSON. |
 | `README.md` | Humans | `/ck status` | Auto-generated index. Don't hand-edit. |
 | `codebase-map.md` | Agents | `/ck map` | Architecture + structure. Hand-edit OK. |
 | `progress.md` | Agents | `/ck progress`, `/ck save` | Append-only. Never truncate. |

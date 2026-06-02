@@ -12,7 +12,7 @@ infrastructure overview, and cross-project connections. Every write is a git com
 
 `/ck <command> [project-slug]`
 
-Commands: `init`, `save`, `load`, `map`, `schema`, `progress`, `link`, `learn`, `learnings`, `ingest`, `status`, `search`, `sync`
+Commands: `init`, `save`, `load`, `map`, `schema`, `progress`, `link`, `learn`, `learnings`, `ingest`, `brief`, `status`, `search`, `sync`
 
 ## Key Rules When Working on This Repo
 

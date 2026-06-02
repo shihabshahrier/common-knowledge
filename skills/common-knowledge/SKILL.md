@@ -7,7 +7,7 @@ description: >
   Cross-platform (macOS, Linux, Windows). Works offline. Readable by any AI agent.
 license: MIT
 user-invocable: true
-argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | learn <text> [project] [--type <t>] [--tags <csv>] | learnings [project] [--tag <t>] | ingest <file> [project] | status | search <query> | sync'
+argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | learn <text> [project] [--type <t>] [--tags <csv>] | learnings [project] [--tag <t>] | ingest <file> [project] | brief <project> | status | search <query> | sync'
 when_to_use: >
   Use when user says: /ck, /common-knowledge, save to common knowledge, load project
   context, update knowledge store, what do I know about X, ck init, ck save, ck load,
@@ -38,6 +38,7 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
 | `learn <text> [project] [--type <t>] [--tags <csv>]` | Capture a gotcha/pattern/pitfall/insight/idea (global by default, or scoped to a project) |
 | `learnings [project] [--tag <t>]` | Recall saved learnings into context |
 | `ingest <file> [project]` | Extract a document (PDF/CSV/DOCX/PPTX/XLSX/…) and distill it into the store |
+| `brief <project>` | Regenerate the curated, always-loaded warm core (`brief.md`) |
 | `status` | List all tracked projects with status |
 | `search <query>` | Full-text search across the entire store |
 | `sync` | Git commit all pending uncommitted changes |
@@ -60,6 +61,7 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
    - `link` → Phase 3E (both project slugs required; if missing, prompt)
    - `learn` → Phase 3F
    - `ingest` → Phase 3G
+   - `brief` → Phase 3H
    - `learnings` → Phase 4L
    - `load` → Phase 4
    - `status` → Phase 5
@@ -157,7 +159,16 @@ Write to the appropriate files under `$CK_HOME/<project>/`:
 
 Update `meta.json` field `last_updated` to current UTC time.
 
-Commit:
+**Then maintain the retrieval layer on every save:**
+- **`brief.md`** — refresh the warm core (Phase 3H); ≤1 screen, read first by `load`.
+- **`index.json`** — upsert a manifest entry per notable thing written so `load` triages without reading bodies. Mark invariants/blockers/must-know gotchas `critical`, else `normal`:
+  ```bash
+  bash scripts/ck-index.sh --home "$CK_HOME" --project <slug> \
+    --id <stable-id> --file <relpath> --summary "<one line>" \
+    --tags "<csv>" --importance critical|normal --no-commit
+  ```
+
+Commit (one commit for the batch):
 ```bash
 git -C "$CK_HOME" add -A
 git -C "$CK_HOME" commit -m "feat(<project>): save session context [<section>]"
@@ -216,6 +227,12 @@ A learning is a gotcha you got stuck on and resolved, a creative idea, a pattern
    ```
    If the script is not reachable, append the entry inline to the target `learnings.md` (append-only — never overwrite) using the learnings template in `references/section-templates.md`, then commit.
 4. Commit: `"feat(<project|global>): capture learning — <title> [learning]"`
+5. For a **project-scoped** learning, add an index entry so it surfaces in `load` — `gotcha`/`pitfall` → `critical`, others → `normal`:
+   ```bash
+   bash scripts/ck-index.sh --home "$CK_HOME" --project <slug> \
+     --id learn-<slugified-title> --file "learnings.md" \
+     --summary "<title>" --tags "<csv>" --importance <critical|normal>
+   ```
 
 ### 3G — ingest (pull knowledge from a document)
 
@@ -231,26 +248,24 @@ Distill a PDF/CSV/DOCX/PPTX/XLSX (or any text file) into the store. **Store the 
    - Do not paste the raw extraction verbatim; capture what matters.
 3. **Record the source** in `meta.json` under a `sources` array (create it if absent) — append `{ "path", "sha256", "ingested_at", "note" }`. This is a pointer only; never commit the original file into `$CK_HOME`.
 4. Set `meta.json.last_updated`, then commit: `"feat(<project>): ingest <filename> [ingest]"`
+5. Add an `index.json` entry for the distilled knowledge (`bash scripts/ck-index.sh … --id ingest-<name> --file <where-distilled> --summary "…"`), and refresh `brief.md` if the document changed the big picture.
+
+### 3H — brief (regenerate the warm core)
+
+`brief.md` is the single always-loaded digest. Regenerate it on save, or on demand via `/ck brief <project>`. Keep it ≤1 screen. Use the `brief.md` template in `references/section-templates.md`: what-it-is, stack, status, **Must-know (critical)**, top decisions, active/blockers, where-to-look pointers. Commit: `"docs(<project>): refresh brief [brief]"`.
 
 ---
 
 ## Phase 4 — Load
 
-1. Read `$CK_HOME/<project>/meta.json` → print: name, type, status, local_path, origin_repo, tech_stack.
-2. Read files in this order (stop if context window approaches limit):
-   - `README.md`
-   - `codebase-map.md`
-   - `progress.md` (last 60 lines only — use `tail`)
-   - `decisions.md`
-   - `connections.md`
-   - `learnings.md` (project-specific lessons, if present)
-   - `schema/db.md` (if `--section schema` or `--section db`)
-   - `api/endpoints.md` (if `--section api`)
-   - `frontend/components.md` (if `--section frontend`)
-   - `infra/overview.md` (if `--section infra`)
-   - `workers/overview.md` (if `--section workers`)
-3. Output: a structured summary of everything loaded.
-4. Print: "Local path: {local_path}" and "Repo: {origin_repo}" so the agent knows where to find code.
+**Two-stage, no-miss retrieval — vital first, detail on demand:**
+
+1. **Load `brief.md` first** (curated warm core: what it is, stack, status, must-know gotchas/invariants, blockers). Alone it gives the vital picture.
+2. Read `meta.json` → name, type, status, local_path, origin_repo, tech_stack, sources.
+3. Read `index.json` (manifest of id/summary/tags/importance) to triage **without** reading every body.
+4. Load entry files by importance until context nears limit: **all `critical` first** (never drop these), then `normal`, then section files on request (`schema/db.md` for `--section schema|db`, `api/endpoints.md` for `--section api`, plus `frontend`/`infra`/`workers`).
+5. Fallback (older project, no brief/index): read `README.md`, `codebase-map.md`, `progress.md` (last 60 lines), `decisions.md`, `connections.md`, `learnings.md`.
+6. Output a structured summary; print local_path and repo.
 
 ---
 
