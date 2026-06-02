@@ -1,7 +1,7 @@
 # common-knowledge — Agent Guide
 
 > **Last updated:** 2026-06-02
-> **Status:** v1.4 — Retrieval layer (brief.md + index.json + importance tiers)
+> **Status:** v1.5 — Scale layer (catalog rollup + capped/manifest search)
 > **Repo:** https://github.com/shihabshahrier/common-knowledge
 > **Author:** shihabshahrier
 
@@ -83,7 +83,8 @@ common-knowledge/               ← This skill repo
 │           ├── ck-recall.sh   ← Bash: SessionStart warm-start injector
 │           ├── ck-autosync.sh ← Bash: SessionEnd commit pending
 │           ├── ck-ingest.sh   ← Bash: extract PDF/CSV/DOCX/PPTX/XLSX → stdout (Phase 3G)
-│           └── ck-index.sh    ← Bash: upsert index.json manifest entry (jq)
+│           ├── ck-index.sh    ← Bash: upsert index.json manifest entry (jq)
+│           └── ck-status.sh   ← Bash: build _global/catalog.json + README + table (scale)
 ├── install.sh                 ← Install to all agent paths (--hooks wires autonomy)
 ├── hooks/
 │   └── hooks.json             ← Claude Code hook snippet (SessionStart + SessionEnd)
@@ -204,7 +205,14 @@ common-knowledge/               ← This skill repo
 - [x] Wired into save (refresh brief + upsert index), learn (gotcha/pitfall→critical), ingest (index entry). `ck-recall.sh` loads `brief.md` first.
 - [x] Two-stage retrieval: cheap-complete-manifest first, pull detail on demand.
 
-### v1.5 — Planned
+### v1.5 — Scale layer ✅ 2026-06-02
+- [x] `_global/catalog.json` — store rollup (1 entry/project: status, stack, tags, critical-count). The store-level twin of per-project `index.json`.
+- [x] `scripts/ck-status.sh` — rebuilds catalog + README + prints compact table; `--project` does O(1) incremental upsert. Status now costs ~2k tokens at 100 projects vs ~8k reading every meta.json (measured 3.3×).
+- [x] `ck-search.sh` reworked — **per-project cap** (default 5) so a common term never silently drops a project (overflow flagged); **`--manifest`** mode greps only catalog+index+brief for ~1k-token cross-repo discovery.
+- [x] Wired: Phase 5 status → ck-status; Phase 6 search → capped + manifest two-stage; save → incremental catalog upsert.
+- [x] Benchmarked at 100 projects: search 88ms, status 59ms, recall 53ms, 5MB store.
+
+### v1.6 — Planned
 - [ ] `/ck sync --remote` — push to Context-Heavy graph via bulk import API
 - [ ] optional local semantic search (`ck-embed`) if grep proves insufficient
 - [ ] `/ck export <project>` — export to JSON compatible with Context-Heavy bulk import
@@ -232,6 +240,7 @@ common-knowledge/               ← This skill repo
 | 2026-06-02 | Ingest = extract→distill→pointer; no blobs | Raw PDFs/Office files bloat git and diff badly. Script extracts text; agent distills to markdown; only a path+sha256 pointer is stored. |
 | 2026-06-02 | Office extraction via zip+XML, not openpyxl/python-pptx | Keep zero pip deps. pptx/xlsx/docx are zipped XML — python3 stdlib reads them. textutil/pandoc/pdftotext used when present. |
 | 2026-06-02 | brief.md + index.json + importance tiers for retrieval | Read-till-limit loading dropped vital info. Two-stage: always-loaded curated brief + machine manifest for triage; load `critical` first so nothing vital is missed. Keeps git+markdown, no DB/vectors. |
+| 2026-06-02 | catalog.json + capped/manifest search for scale | At 100 repos, status reading every meta.json = ~8k tokens, and a global search cap silently dropped projects. Catalog = store-level rollup (cheap status + discovery); per-project search cap = no project lost. Same two-stage pattern, lifted to store level. |
 | 2026-06-02 | `connections.md` mirrors Context-Heavy edge model | Future: each connection → a graph edge. Migration becomes trivial. |
 | 2026-06-02 | `meta.json` machine-readable per project | Agents parse JSON faster than prose. Status, type, paths available without reading Markdown. |
 | 2026-06-02 | Append-only for `progress.md`, `connections.md`, `learnings.md` | History must never be lost. These files are logs, not documents. |
