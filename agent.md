@@ -1,7 +1,7 @@
 # common-knowledge — Agent Guide
 
 > **Last updated:** 2026-06-02
-> **Status:** v1.3 — Document ingestion (PDF/CSV/Office)
+> **Status:** v1.4 — Retrieval layer (brief.md + index.json + importance tiers)
 > **Repo:** https://github.com/shihabshahrier/common-knowledge
 > **Author:** shihabshahrier
 
@@ -82,7 +82,8 @@ common-knowledge/               ← This skill repo
 │           ├── ck-learn.sh    ← Bash: append a learning (Phase 3F)
 │           ├── ck-recall.sh   ← Bash: SessionStart warm-start injector
 │           ├── ck-autosync.sh ← Bash: SessionEnd commit pending
-│           └── ck-ingest.sh   ← Bash: extract PDF/CSV/DOCX/PPTX/XLSX → stdout (Phase 3G)
+│           ├── ck-ingest.sh   ← Bash: extract PDF/CSV/DOCX/PPTX/XLSX → stdout (Phase 3G)
+│           └── ck-index.sh    ← Bash: upsert index.json manifest entry (jq)
 ├── install.sh                 ← Install to all agent paths (--hooks wires autonomy)
 ├── hooks/
 │   └── hooks.json             ← Claude Code hook snippet (SessionStart + SessionEnd)
@@ -130,6 +131,7 @@ common-knowledge/               ← This skill repo
 /ck learn "<text>" [project] [--type <t>] [--tags <csv>]  # Capture a gotcha/insight/idea
 /ck learnings [project] [--tag <t>]                        # Recall saved learnings
 /ck ingest <file> [project]                                # Extract+distill a document into the store
+/ck brief <project>                                        # Regenerate the always-loaded warm core (brief.md)
 /ck status                         # List all tracked projects
 /ck search <query>                 # Full-text search across the store
 /ck sync                           # Git commit all pending changes
@@ -195,8 +197,16 @@ common-knowledge/               ← This skill repo
 - [x] `meta.json` gains optional `sources` array; store-layout + git-conventions updated.
 - [x] Propagated to all rule files + README/agent.md.
 
-### v1.4 — Planned
+### v1.4 — Retrieval layer ✅ 2026-06-02
+- [x] `brief.md` per project — curated warm core, always loaded first by `load` and the recall hook. `/ck brief` regenerates (Phase 3H).
+- [x] `index.json` per project — manifest (id/file/summary/tags/importance/updated). `scripts/ck-index.sh` upserts via jq (dedup by id, valid JSON).
+- [x] **Importance tiers** — `load` reads brief → meta → index → all `critical` entries first → `normal` as budget allows. Vital info never dropped at context limit.
+- [x] Wired into save (refresh brief + upsert index), learn (gotcha/pitfall→critical), ingest (index entry). `ck-recall.sh` loads `brief.md` first.
+- [x] Two-stage retrieval: cheap-complete-manifest first, pull detail on demand.
+
+### v1.5 — Planned
 - [ ] `/ck sync --remote` — push to Context-Heavy graph via bulk import API
+- [ ] optional local semantic search (`ck-embed`) if grep proves insufficient
 - [ ] `/ck export <project>` — export to JSON compatible with Context-Heavy bulk import
 - [ ] `/ck diff <project>` — show git diff for a project's files
 - [ ] `/ck archive <project>` — set status to archived + commit
@@ -221,6 +231,7 @@ common-knowledge/               ← This skill repo
 | 2026-06-02 | Hooks scaffold-only; `--hooks` to install | Editing global `~/.claude/settings.json` is the user's call. Default install never touches it; `--hooks` opts in with a backup. |
 | 2026-06-02 | Ingest = extract→distill→pointer; no blobs | Raw PDFs/Office files bloat git and diff badly. Script extracts text; agent distills to markdown; only a path+sha256 pointer is stored. |
 | 2026-06-02 | Office extraction via zip+XML, not openpyxl/python-pptx | Keep zero pip deps. pptx/xlsx/docx are zipped XML — python3 stdlib reads them. textutil/pandoc/pdftotext used when present. |
+| 2026-06-02 | brief.md + index.json + importance tiers for retrieval | Read-till-limit loading dropped vital info. Two-stage: always-loaded curated brief + machine manifest for triage; load `critical` first so nothing vital is missed. Keeps git+markdown, no DB/vectors. |
 | 2026-06-02 | `connections.md` mirrors Context-Heavy edge model | Future: each connection → a graph edge. Migration becomes trivial. |
 | 2026-06-02 | `meta.json` machine-readable per project | Agents parse JSON faster than prose. Status, type, paths available without reading Markdown. |
 | 2026-06-02 | Append-only for `progress.md`, `connections.md`, `learnings.md` | History must never be lost. These files are logs, not documents. |

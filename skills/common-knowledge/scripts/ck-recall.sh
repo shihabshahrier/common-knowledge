@@ -31,6 +31,13 @@ echo "📚 common-knowledge — recalled context for project: $SLUG"
 echo "   (store: $CK_HOME)"
 echo ""
 
+# Brief is the curated warm core — load it first and in full if present.
+if [[ -f "$PDIR/brief.md" ]]; then
+  echo "### Brief"
+  cat "$PDIR/brief.md"
+  echo ""
+fi
+
 if [[ -f "$PDIR/meta.json" ]]; then
   DESC=$(sed -n 's/.*"description" *: *"\([^"]*\)".*/\1/p' "$PDIR/meta.json" | head -1)
   STATUS=$(sed -n 's/.*"status" *: *"\([^"]*\)".*/\1/p' "$PDIR/meta.json" | head -1)

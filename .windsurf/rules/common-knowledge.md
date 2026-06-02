@@ -18,6 +18,7 @@ Maintain a Git-backed local knowledge store across all your projects and AI agen
 - `learn "<text>" [project]` — Capture a gotcha/insight/idea
 - `learnings [project]` — Recall saved learnings
 - `ingest <file> [project]` — Extract a PDF/CSV/DOCX/PPTX/XLSX into the store
+- `brief <project>` — Regenerate the always-loaded warm core
 - `status` — List all projects
 - `search <query>` — Full-text search
 - `sync` — Git commit pending changes

@@ -181,6 +181,56 @@ Cross-project links and integration points.
 
 ---
 
+## brief.md
+
+The curated **warm core** — the single file `load` and the SessionStart hook read first. Regenerate on save (overwrite is fine; it is a digest, not a log). Keep it to ~one screen. Lead with what an agent must not miss.
+
+```markdown
+# Brief — {Project Name}
+
+> {type} · {status} · {tech_stack joined} · updated {YYYY-MM-DD}
+
+{One paragraph: what this project is and does.}
+
+## Must know (critical)
+- {invariant / hard constraint / must-know gotcha}
+- {active blocker, if any}
+
+## Top decisions
+- {decision} — {why}
+
+## Active / next
+- {current focus} · {next step}
+
+## Where to look
+- map → `codebase-map.md` · lessons → `learnings.md` · schema → `schema/db.md`
+- api → `api/endpoints.md` · links → `connections.md` · sources → `meta.json:sources`
+```
+
+---
+
+## index.json
+
+The machine-readable **manifest**: one entry per notable fact/file so an agent can triage what to load without reading bodies. Maintained by `scripts/ck-index.sh` (upsert by `id`). `importance: critical` entries are loaded first and never dropped.
+
+```json
+{
+  "project": "{slug}",
+  "entries": [
+    {
+      "id": "db-pooling",
+      "file": "learnings.md",
+      "summary": "PgBouncer transaction mode breaks libpq prepared statements.",
+      "tags": ["postgres", "pooling"],
+      "importance": "critical",
+      "updated": "2026-06-02T15:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
 ## learnings.md
 
 Append a new entry for each learning. Never overwrite existing entries.
