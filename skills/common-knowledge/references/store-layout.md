@@ -94,7 +94,10 @@ $env:CK_HOME = "C:\path\to\knowledge-store"
   "tech_stack": ["Go", "React", "PostgreSQL"],
   "related_projects": ["other-slug-1", "other-slug-2"],
   "last_updated": "2026-06-02T03:15:00Z",
-  "description": "One-line description of what this project does."
+  "description": "One-line description of what this project does.",
+  "sources": [
+    { "path": "/abs/path/to/spec.pdf", "sha256": "…", "ingested_at": "2026-06-02T03:20:00Z", "note": "API spec, ingested" }
+  ]
 }
 ```
 
@@ -114,6 +117,7 @@ $env:CK_HOME = "C:\path\to\knowledge-store"
 | `related_projects` | array of strings | ✅ | Slugs of connected projects (quick-ref cache — authoritative source is `connections.md`). Auto-updated by `/ck link`. Empty `[]` if none |
 | `last_updated` | string | ✅ | ISO 8601 UTC datetime. Update on every write. |
 | `description` | string | ✅ | One sentence. What is this project? |
+| `sources` | array of objects | ⬜ | Documents ingested via `/ck ingest`. Each: `path`, `sha256`, `ingested_at`, `note`. Pointer only — the raw file is **not** stored in `$CK_HOME`. Omit if none. |
 
 ### Input/Output Examples
 

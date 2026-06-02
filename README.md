@@ -61,9 +61,16 @@ Installs to all major AI agent paths automatically:
 | `/ck link <a> <b>` | Record cross-project connection |
 | `/ck learn "<text>" [project]` | Capture a gotcha/pattern/pitfall/insight/idea |
 | `/ck learnings [project]` | Recall saved learnings into context |
+| `/ck ingest <file> [project]` | Extract a PDF/CSV/DOCX/PPTX/XLSX and distill it into the store |
 | `/ck status` | List all tracked projects |
 | `/ck search <query>` | Full-text search across the store |
 | `/ck sync` | Git commit all pending changes |
+
+## Ingest documents
+
+`/ck ingest <file>` pulls knowledge out of documents — **PDF, CSV, DOCX, PPTX, XLSX**, and any text format — and distills it into the store. Extraction is dependency-light: `pdftotext`/`textutil`/`pandoc` when present, otherwise a built-in zip+XML reader (no `openpyxl`/`python-pptx` needed) for Office files; CSV becomes a Markdown table.
+
+The raw file is **never** committed — the agent summarizes the extracted text into `codebase-map.md` / `decisions.md` / `learnings.md` and records a source pointer (path + sha256) in `meta.json`.
 
 ## Autonomy (optional)
 

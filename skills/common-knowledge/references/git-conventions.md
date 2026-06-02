@@ -91,6 +91,7 @@ chore: sync knowledge store 2026-06-02T03:15Z
 | `link <a> <b>` | `feat: link <a> <-> <b> [<rel-type>]` |
 | `learn` (global) | `feat(global): capture learning — <title> [learning]` |
 | `learn <project>` | `feat(<project>): capture learning — <title> [learning]` |
+| `ingest <file>` | `feat(<project>): ingest <filename> [ingest]` |
 | `status` | `chore: update project index` |
 | `sync` | `chore: sync knowledge store YYYY-MM-DDTHH:MMZ` |
 
