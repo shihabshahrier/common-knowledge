@@ -1,7 +1,7 @@
 # common-knowledge — Agent Guide
 
 > **Last updated:** 2026-06-02
-> **Status:** v1.0.1 — Hardened (scripts bundled, drift removed)
+> **Status:** v1.1 — Learnings capability added
 > **Repo:** https://github.com/shihabshahrier/common-knowledge
 > **Author:** shihabshahrier
 
@@ -44,13 +44,15 @@ this repo (skill code)          knowledge store (data, separate)
 │       ├── SKILL.md            ├── _global/
 │       ├── references/         │   ├── agent-config.md
 │       └── scripts/            │   ├── tech-decisions.md
-├── install.sh                  │   └── integrations.md
-└── agent.md  ← THIS FILE       └── {project-slug}/
+├── install.sh                  │   ├── integrations.md
+└── agent.md  ← THIS FILE       │   └── learnings.md
+                                └── {project-slug}/
                                     ├── meta.json
                                     ├── codebase-map.md
                                     ├── progress.md
                                     ├── decisions.md
                                     ├── connections.md
+                                    ├── learnings.md
                                     ├── schema/
                                     ├── api/
                                     ├── frontend/
@@ -76,7 +78,8 @@ common-knowledge/               ← This skill repo
 │       │   └── section-templates.md ← Markdown templates
 │       └── scripts/           ← Bundled — ship with the skill via install.sh
 │           ├── ck-init.sh     ← Bash: deterministic store init (Phase 1)
-│           └── ck-search.sh   ← Bash: cross-store grep (Phase 6)
+│           ├── ck-search.sh   ← Bash: cross-store grep (Phase 6)
+│           └── ck-learn.sh    ← Bash: append a learning (Phase 3F)
 ├── install.sh                 ← Install to all agent paths
 ├── agents/
 │   └── openai.yaml            ← Codex display config
@@ -119,6 +122,8 @@ common-knowledge/               ← This skill repo
 /ck schema <project>               # Save DB schema or API spec
 /ck progress <project>             # Append timestamped progress entry
 /ck link <a> <b> [--type <rel>]    # Record cross-project connection
+/ck learn "<text>" [project] [--type <t>] [--tags <csv>]  # Capture a gotcha/insight/idea
+/ck learnings [project] [--tag <t>]                        # Recall saved learnings
 /ck status                         # List all tracked projects
 /ck search <query>                 # Full-text search across the store
 /ck sync                           # Git commit all pending changes
@@ -163,7 +168,15 @@ common-knowledge/               ← This skill repo
 - [x] `.github/copilot-instructions.md`
 - [x] `README.md`, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md`, `LICENSE`
 
-### v1.1 — Planned
+### v1.1 — Learnings ✅ 2026-06-02
+- [x] `/ck learn "<text>" [project] [--type <t>] [--tags <csv>]` — capture a gotcha/pattern/pitfall/insight/idea.
+- [x] `/ck learnings [project] [--tag <t>]` — recall lessons into context (Phase 4L).
+- [x] `scripts/ck-learn.sh` — deterministic append + commit helper; global default, project-scopable.
+- [x] `_global/learnings.md` (reusable) + `<project>/learnings.md` (project-specific), append-only.
+- [x] `learnings.md` added to `load` read order; searchable via existing grep.
+- [x] Templates + store-layout + git-conventions updated for learnings.
+
+### v1.2 — Planned
 - [ ] `/ck sync --remote` — push to Context-Heavy graph via bulk import API
 - [ ] `/ck export <project>` — export to JSON compatible with Context-Heavy bulk import
 - [ ] `/ck diff <project>` — show git diff for a project's files
@@ -183,9 +196,11 @@ common-knowledge/               ← This skill repo
 | 2026-06-02 | Both `--auto` and explicit project detection | Explicit is default (precision). `--auto` for scripts and automation. |
 | 2026-06-02 | Separate skill repo from knowledge store | Skill = code. Store = data. Clean separation. |
 | 2026-06-02 | `_global/` for cross-project knowledge | Some knowledge spans projects. Need a dedicated home. |
+| 2026-06-02 | Learnings default to `_global`, project-scopable | Lessons (gotchas/patterns/insights) are usually reusable across projects; default global, allow project scope. |
+| 2026-06-02 | `ck-learn.sh` persists; agent composes prose | Same split as init/search — deterministic write + commit, LLM writes the content. Hook-friendly for auto-capture. |
 | 2026-06-02 | `connections.md` mirrors Context-Heavy edge model | Future: each connection → a graph edge. Migration becomes trivial. |
 | 2026-06-02 | `meta.json` machine-readable per project | Agents parse JSON faster than prose. Status, type, paths available without reading Markdown. |
-| 2026-06-02 | Append-only for `progress.md` and `connections.md` | History must never be lost. These files are logs, not documents. |
+| 2026-06-02 | Append-only for `progress.md`, `connections.md`, `learnings.md` | History must never be lost. These files are logs, not documents. |
 
 ---
 

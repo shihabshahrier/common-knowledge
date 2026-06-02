@@ -15,6 +15,8 @@ Maintain a Git-backed local knowledge store across all your projects and AI agen
 - `schema <project>` — Save schema/API spec
 - `progress <project>` — Append progress log
 - `link <a> <b>` — Record connection
+- `learn "<text>" [project]` — Capture a gotcha/insight/idea
+- `learnings [project]` — Recall saved learnings
 - `status` — List all projects
 - `search <query>` — Full-text search
 - `sync` — Git commit pending changes

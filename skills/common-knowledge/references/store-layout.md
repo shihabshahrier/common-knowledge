@@ -28,7 +28,8 @@ $CK_HOME/                             ← Git root (e.g. ~/common-knowledge)
 ├── _global/                          ← Cross-project, non-project-specific knowledge
 │   ├── agent-config.md               ← AI agent keys, model preferences, environment notes
 │   ├── tech-decisions.md             ← Architecture decisions spanning all projects
-│   └── integrations.md               ← How projects connect (summary of all connections.md)
+│   ├── integrations.md               ← How projects connect (summary of all connections.md)
+│   └── learnings.md                  ← Reusable gotchas, patterns, insights (append-only)
 │
 └── {project-slug}/                   ← One directory per project (kebab-case slug)
     ├── meta.json                     ← Machine-readable project metadata (REQUIRED)
@@ -37,6 +38,7 @@ $CK_HOME/                             ← Git root (e.g. ~/common-knowledge)
     ├── progress.md                   ← Append-only session log + implementation status
     ├── decisions.md                  ← ADR-style decision log for this project
     ├── connections.md                ← Links to other projects + integration details
+    ├── learnings.md                  ← Project-specific lessons (append-only, optional)
     │
     ├── schema/
     │   ├── db.md                     ← Database schema (tables, columns, indexes, relations)
@@ -182,6 +184,7 @@ Description: Marketing automation and indexing platform.
 | `progress.md` | Agents | `/ck progress`, `/ck save` | Append-only. Never truncate. |
 | `decisions.md` | Agents, Humans | `/ck save` | ADR style. Append only. |
 | `connections.md` | Agents | `/ck link` | Edge-compatible format for Context-Heavy. Append only. |
+| `learnings.md` | Agents, Humans | `/ck learn` | Gotchas, patterns, insights. Append only. Project-specific. |
 | `schema/db.md` | Agents | `/ck schema` | DB schema documentation. |
 | `schema/db.sql` | Agents | `/ck schema` | Raw DDL. Optional. |
 | `api/endpoints.md` | Agents | `/ck schema` | API documentation. |
@@ -190,6 +193,7 @@ Description: Marketing automation and indexing platform.
 | `infra/overview.md` | Agents | `/ck save --section infra` | Cloud infra, env vars, costs. |
 | `workers/overview.md` | Agents | `/ck save --section workers` | Background jobs and queues. |
 | `_global/integrations.md` | Agents | `/ck link` | Cross-project integration map. |
+| `_global/learnings.md` | Agents, Humans | `/ck learn` | Reusable gotchas/patterns/insights. Append only. |
 | `_global/tech-decisions.md` | Agents, Humans | Manual | Architecture decisions spanning all projects. |
 | `_global/agent-config.md` | Agents | Manual | AI agent keys, model preferences. |
 
@@ -204,6 +208,7 @@ When running Phase 1 (init), create these files in this order:
 3. `$CK_HOME/_global/agent-config.md`
 4. `$CK_HOME/_global/tech-decisions.md`
 5. `$CK_HOME/_global/integrations.md`
-6. `git init` → `git add -A` → `git commit`
+6. `$CK_HOME/_global/learnings.md`
+7. `git init` → `git add -A` → `git commit`
 
 Do NOT create project directories during init — only on first `save` or `map` for that project.
