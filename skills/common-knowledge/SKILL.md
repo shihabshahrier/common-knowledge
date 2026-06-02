@@ -7,14 +7,16 @@ description: >
   Cross-platform (macOS, Linux, Windows). Works offline. Readable by any AI agent.
 license: MIT
 user-invocable: true
-argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | learn <text> [project] [--type <t>] [--tags <csv>] | learnings [project] [--tag <t>] | status | search <query> | sync'
+argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | learn <text> [project] [--type <t>] [--tags <csv>] | learnings [project] [--tag <t>] | ingest <file> [project] | status | search <query> | sync'
 when_to_use: >
   Use when user says: /ck, /common-knowledge, save to common knowledge, load project
   context, update knowledge store, what do I know about X, ck init, ck save, ck load,
   ck status, ck search, ck map, ck schema, ck progress, ck sync, ck link, ck learn,
   ck learnings, add this to my knowledge base, store this for later, remember this
   project, remember this lesson, save this learning, log a gotcha, note this pitfall,
-  capture this insight, what have I learned about X, recall lessons.
+  capture this insight, what have I learned about X, recall lessons, ck ingest,
+  ingest this pdf, import this document, extract this csv/docx/pptx/xlsx, read
+  this file into knowledge, summarize this document into the store.
 metadata:
   author: shihabshahrier
   category: knowledge-management
@@ -35,6 +37,7 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
 | `link <project-a> <project-b> [--type <rel>]` | Record a cross-project connection |
 | `learn <text> [project] [--type <t>] [--tags <csv>]` | Capture a gotcha/pattern/pitfall/insight/idea (global by default, or scoped to a project) |
 | `learnings [project] [--tag <t>]` | Recall saved learnings into context |
+| `ingest <file> [project]` | Extract a document (PDF/CSV/DOCX/PPTX/XLSX/…) and distill it into the store |
 | `status` | List all tracked projects with status |
 | `search <query>` | Full-text search across the entire store |
 | `sync` | Git commit all pending uncommitted changes |
@@ -56,6 +59,7 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
    - `save`, `map`, `schema`, `progress` (with explicit project slug) → Phase 3
    - `link` → Phase 3E (both project slugs required; if missing, prompt)
    - `learn` → Phase 3F
+   - `ingest` → Phase 3G
    - `learnings` → Phase 4L
    - `load` → Phase 4
    - `status` → Phase 5
@@ -123,7 +127,7 @@ When `--auto` is present OR user did not provide a project slug:
 
 ---
 
-## Phase 3 — Save / Map / Schema / Progress / Link / Learn
+## Phase 3 — Save / Map / Schema / Progress / Link / Learn / Ingest
 
 Load `references/section-templates.md` before writing any files.
 
@@ -212,6 +216,21 @@ A learning is a gotcha you got stuck on and resolved, a creative idea, a pattern
    ```
    If the script is not reachable, append the entry inline to the target `learnings.md` (append-only — never overwrite) using the learnings template in `references/section-templates.md`, then commit.
 4. Commit: `"feat(<project|global>): capture learning — <title> [learning]"`
+
+### 3G — ingest (pull knowledge from a document)
+
+Distill a PDF/CSV/DOCX/PPTX/XLSX (or any text file) into the store. **Store the distilled knowledge, not the raw file** — keep blobs out of git.
+
+1. Extract the document's text with the bundled helper:
+   ```bash
+   bash scripts/ck-ingest.sh "<file>"
+   ```
+   It prints the extracted text (capped by `CK_INGEST_MAX_LINES`, default 2000) plus a **source pointer** (path, sha256, bytes). For PDFs, if `pdftotext` is absent the script says so — read the PDF directly with your own file-reading tool instead.
+2. **Distill** the extracted text — summarize into the project's existing files as fits the content:
+   - facts/architecture → `codebase-map.md`; decisions → `decisions.md`; lessons → `learnings.md` (via 3F); status/log → `progress.md`.
+   - Do not paste the raw extraction verbatim; capture what matters.
+3. **Record the source** in `meta.json` under a `sources` array (create it if absent) — append `{ "path", "sha256", "ingested_at", "note" }`. This is a pointer only; never commit the original file into `$CK_HOME`.
+4. Set `meta.json.last_updated`, then commit: `"feat(<project>): ingest <filename> [ingest]"`
 
 ---
 

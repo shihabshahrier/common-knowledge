@@ -17,6 +17,7 @@ Maintain a Git-backed local knowledge store across all your projects and AI agen
 - `link <a> <b>` — Record connection
 - `learn "<text>" [project]` — Capture a gotcha/insight/idea
 - `learnings [project]` — Recall saved learnings
+- `ingest <file> [project]` — Extract a PDF/CSV/DOCX/PPTX/XLSX into the store
 - `status` — List all projects
 - `search <query>` — Full-text search
 - `sync` — Git commit pending changes

@@ -18,6 +18,7 @@ Invocation: `/ck <command> [project]` or `/common-knowledge <command> [project]`
 - `link <a> <b> [--type <rel>]` — Record cross-project connection
 - `learn "<text>" [project] [--type <t>] [--tags <csv>]` — Capture a gotcha/pattern/pitfall/insight/idea
 - `learnings [project] [--tag <t>]` — Recall saved learnings into context
+- `ingest <file> [project]` — Extract a PDF/CSV/DOCX/PPTX/XLSX and distill it into the store
 - `status` — List all tracked projects
 - `search <query>` — Full-text search across the store
 - `sync` — Git commit all pending changes

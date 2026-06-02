@@ -1,7 +1,7 @@
 # common-knowledge — Agent Guide
 
 > **Last updated:** 2026-06-02
-> **Status:** v1.2 — Learnings + optional autonomy hooks
+> **Status:** v1.3 — Document ingestion (PDF/CSV/Office)
 > **Repo:** https://github.com/shihabshahrier/common-knowledge
 > **Author:** shihabshahrier
 
@@ -81,7 +81,8 @@ common-knowledge/               ← This skill repo
 │           ├── ck-search.sh   ← Bash: cross-store grep (Phase 6)
 │           ├── ck-learn.sh    ← Bash: append a learning (Phase 3F)
 │           ├── ck-recall.sh   ← Bash: SessionStart warm-start injector
-│           └── ck-autosync.sh ← Bash: SessionEnd commit pending
+│           ├── ck-autosync.sh ← Bash: SessionEnd commit pending
+│           └── ck-ingest.sh   ← Bash: extract PDF/CSV/DOCX/PPTX/XLSX → stdout (Phase 3G)
 ├── install.sh                 ← Install to all agent paths (--hooks wires autonomy)
 ├── hooks/
 │   └── hooks.json             ← Claude Code hook snippet (SessionStart + SessionEnd)
@@ -128,6 +129,7 @@ common-knowledge/               ← This skill repo
 /ck link <a> <b> [--type <rel>]    # Record cross-project connection
 /ck learn "<text>" [project] [--type <t>] [--tags <csv>]  # Capture a gotcha/insight/idea
 /ck learnings [project] [--tag <t>]                        # Recall saved learnings
+/ck ingest <file> [project]                                # Extract+distill a document into the store
 /ck status                         # List all tracked projects
 /ck search <query>                 # Full-text search across the store
 /ck sync                           # Git commit all pending changes
@@ -187,7 +189,13 @@ common-knowledge/               ← This skill repo
 - [x] `install.sh --hooks` — jq-merges hooks into `~/.claude/settings.json`, backs up first, idempotent (no dup on re-run). Scaffold-only by default — global settings untouched unless `--hooks` passed.
 - [x] SKILL.md "Autonomy" section documents the passive recall+sync model and that capture stays agent-driven.
 
-### v1.3 — Planned
+### v1.3 — Document ingestion ✅ 2026-06-02
+- [x] `scripts/ck-ingest.sh <file>` — extract text/markdown to stdout for the agent to distill. Supports PDF (pdftotext), CSV (→md table), DOCX/RTF/ODT/HTML (textutil/pandoc), PPTX + XLSX + DOCX-fallback via dependency-free zip+XML (python3 stdlib — no openpyxl/python-pptx). Source pointer (path+sha256+bytes) printed.
+- [x] `/ck ingest <file> [project]` — Phase 3G: extract → distill into codebase-map/decisions/learnings → record `meta.json.sources[]`. Raw file never committed.
+- [x] `meta.json` gains optional `sources` array; store-layout + git-conventions updated.
+- [x] Propagated to all rule files + README/agent.md.
+
+### v1.4 — Planned
 - [ ] `/ck sync --remote` — push to Context-Heavy graph via bulk import API
 - [ ] `/ck export <project>` — export to JSON compatible with Context-Heavy bulk import
 - [ ] `/ck diff <project>` — show git diff for a project's files
@@ -211,6 +219,8 @@ common-knowledge/               ← This skill repo
 | 2026-06-02 | `ck-learn.sh` persists; agent composes prose | Same split as init/search — deterministic write + commit, LLM writes the content. Hook-friendly for auto-capture. |
 | 2026-06-02 | Autonomy = recall + sync only; capture stays agent-driven | Hooks are deterministic shell — can't compose a learning. So auto-recall (read) + auto-sync (commit) are hooks; capture remains an LLM action via `/ck learn`. |
 | 2026-06-02 | Hooks scaffold-only; `--hooks` to install | Editing global `~/.claude/settings.json` is the user's call. Default install never touches it; `--hooks` opts in with a backup. |
+| 2026-06-02 | Ingest = extract→distill→pointer; no blobs | Raw PDFs/Office files bloat git and diff badly. Script extracts text; agent distills to markdown; only a path+sha256 pointer is stored. |
+| 2026-06-02 | Office extraction via zip+XML, not openpyxl/python-pptx | Keep zero pip deps. pptx/xlsx/docx are zipped XML — python3 stdlib reads them. textutil/pandoc/pdftotext used when present. |
 | 2026-06-02 | `connections.md` mirrors Context-Heavy edge model | Future: each connection → a graph edge. Migration becomes trivial. |
 | 2026-06-02 | `meta.json` machine-readable per project | Agents parse JSON faster than prose. Status, type, paths available without reading Markdown. |
 | 2026-06-02 | Append-only for `progress.md`, `connections.md`, `learnings.md` | History must never be lost. These files are logs, not documents. |
