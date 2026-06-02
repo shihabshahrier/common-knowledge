@@ -65,6 +65,19 @@ Installs to all major AI agent paths automatically:
 | `/ck search <query>` | Full-text search across the store |
 | `/ck sync` | Git commit all pending changes |
 
+## Autonomy (optional)
+
+By default the store is trigger-driven — you (or the agent) invoke `/ck`. Opt into passive autonomy with deterministic Claude Code hooks:
+
+```bash
+bash install.sh --hooks   # backs up ~/.claude/settings.json first, idempotent
+```
+
+- **SessionStart → warm start:** auto-detects the project from your cwd and injects its saved lessons, recent progress, and metadata into context — the agent begins each session already knowing past gotchas and decisions.
+- **SessionEnd → auto-sync:** commits any uncommitted store changes so nothing is lost.
+
+Capture stays agent-driven (hooks can't compose a lesson) — the agent runs `/ck learn` / `/ck save` when something is worth remembering.
+
 ## How It Works
 
 ```

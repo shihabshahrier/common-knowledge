@@ -323,6 +323,17 @@ If git is not available: omit commit line and warn "git not found — changes sa
 
 ---
 
+## Autonomy (optional hooks)
+
+The store is trigger-driven by default. Two **deterministic, opt-in** Claude Code hooks add passive autonomy (wire them with `bash install.sh --hooks`):
+
+- **SessionStart → `scripts/ck-recall.sh`** — detects the project from cwd; if the store has knowledge for it, injects its lessons (`learnings.md`), `_global` lesson titles, meta, and recent progress so the session starts warm. Silent when no match.
+- **SessionEnd → `scripts/ck-autosync.sh`** — commits any uncommitted store changes so nothing written during the session is lost. Silent when clean.
+
+Capture stays agent-driven: hooks cannot compose a learning. When a session resolves a gotcha, finds a pattern, or makes a notable decision, proactively run `/ck learn` or `/ck save` for it.
+
+---
+
 ## Error Handling
 
 | Situation | Action |
