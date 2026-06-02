@@ -1,7 +1,7 @@
 # common-knowledge — Agent Guide
 
 > **Last updated:** 2026-06-02
-> **Status:** v1.1 — Learnings capability added
+> **Status:** v1.2 — Learnings + optional autonomy hooks
 > **Repo:** https://github.com/shihabshahrier/common-knowledge
 > **Author:** shihabshahrier
 
@@ -79,8 +79,12 @@ common-knowledge/               ← This skill repo
 │       └── scripts/           ← Bundled — ship with the skill via install.sh
 │           ├── ck-init.sh     ← Bash: deterministic store init (Phase 1)
 │           ├── ck-search.sh   ← Bash: cross-store grep (Phase 6)
-│           └── ck-learn.sh    ← Bash: append a learning (Phase 3F)
-├── install.sh                 ← Install to all agent paths
+│           ├── ck-learn.sh    ← Bash: append a learning (Phase 3F)
+│           ├── ck-recall.sh   ← Bash: SessionStart warm-start injector
+│           └── ck-autosync.sh ← Bash: SessionEnd commit pending
+├── install.sh                 ← Install to all agent paths (--hooks wires autonomy)
+├── hooks/
+│   └── hooks.json             ← Claude Code hook snippet (SessionStart + SessionEnd)
 ├── agents/
 │   └── openai.yaml            ← Codex display config
 ├── .claude-plugin/
@@ -176,7 +180,14 @@ common-knowledge/               ← This skill repo
 - [x] `learnings.md` added to `load` read order; searchable via existing grep.
 - [x] Templates + store-layout + git-conventions updated for learnings.
 
-### v1.2 — Planned
+### v1.2 — Autonomy hooks ✅ 2026-06-02
+- [x] `scripts/ck-recall.sh` — SessionStart hook: detect project from cwd, inject lessons + meta + recent progress (warm start). Read-only, silent on no-match.
+- [x] `scripts/ck-autosync.sh` — SessionEnd hook: commit pending store changes. Silent when clean; no empty commits.
+- [x] `hooks/hooks.json` — paste-ready Claude Code hook config.
+- [x] `install.sh --hooks` — jq-merges hooks into `~/.claude/settings.json`, backs up first, idempotent (no dup on re-run). Scaffold-only by default — global settings untouched unless `--hooks` passed.
+- [x] SKILL.md "Autonomy" section documents the passive recall+sync model and that capture stays agent-driven.
+
+### v1.3 — Planned
 - [ ] `/ck sync --remote` — push to Context-Heavy graph via bulk import API
 - [ ] `/ck export <project>` — export to JSON compatible with Context-Heavy bulk import
 - [ ] `/ck diff <project>` — show git diff for a project's files
@@ -198,6 +209,8 @@ common-knowledge/               ← This skill repo
 | 2026-06-02 | `_global/` for cross-project knowledge | Some knowledge spans projects. Need a dedicated home. |
 | 2026-06-02 | Learnings default to `_global`, project-scopable | Lessons (gotchas/patterns/insights) are usually reusable across projects; default global, allow project scope. |
 | 2026-06-02 | `ck-learn.sh` persists; agent composes prose | Same split as init/search — deterministic write + commit, LLM writes the content. Hook-friendly for auto-capture. |
+| 2026-06-02 | Autonomy = recall + sync only; capture stays agent-driven | Hooks are deterministic shell — can't compose a learning. So auto-recall (read) + auto-sync (commit) are hooks; capture remains an LLM action via `/ck learn`. |
+| 2026-06-02 | Hooks scaffold-only; `--hooks` to install | Editing global `~/.claude/settings.json` is the user's call. Default install never touches it; `--hooks` opts in with a backup. |
 | 2026-06-02 | `connections.md` mirrors Context-Heavy edge model | Future: each connection → a graph edge. Migration becomes trivial. |
 | 2026-06-02 | `meta.json` machine-readable per project | Agents parse JSON faster than prose. Status, type, paths available without reading Markdown. |
 | 2026-06-02 | Append-only for `progress.md`, `connections.md`, `learnings.md` | History must never be lost. These files are logs, not documents. |
