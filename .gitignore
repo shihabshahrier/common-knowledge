@@ -8,3 +8,7 @@ __pycache__/
 **/.DS_Store
 Thumbs.db
 *.tmp
+
+# Local editor / agent config (machine-specific)
+.claude/settings.json
+.claude/settings.local.json
