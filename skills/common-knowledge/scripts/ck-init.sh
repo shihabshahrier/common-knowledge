@@ -96,6 +96,18 @@ This file is updated automatically by `/ck link`.
 EOF
 fi
 
+if [[ ! -f "$CK_HOME/_global/learnings.md" ]]; then
+  cat > "$CK_HOME/_global/learnings.md" << 'EOF'
+# Learnings — Global
+
+Append-only log of gotchas, fixes, patterns, and insights captured for future
+decision-making. Newest entries at the bottom. Recall with `/ck learnings`.
+Updated automatically by `/ck learn`.
+
+---
+EOF
+fi
+
 # ─── Root README (index, auto-generated) ───────────────────────────────────────
 TIMESTAMP=$(date -u "+%Y-%m-%d %H:%M UTC" 2>/dev/null || echo "unknown")
 cat > "$CK_HOME/README.md" << EOF

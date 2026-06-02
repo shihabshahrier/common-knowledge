@@ -89,6 +89,8 @@ chore: sync knowledge store 2026-06-02T03:15Z
 | `schema <project>` (API) | `docs(<project>): update api endpoints [api]` |
 | `progress <project>` | `chore(<project>): log progress YYYY-MM-DD [progress]` |
 | `link <a> <b>` | `feat: link <a> <-> <b> [<rel-type>]` |
+| `learn` (global) | `feat(global): capture learning — <title> [learning]` |
+| `learn <project>` | `feat(<project>): capture learning — <title> [learning]` |
 | `status` | `chore: update project index` |
 | `sync` | `chore: sync knowledge store YYYY-MM-DDTHH:MMZ` |
 

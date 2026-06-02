@@ -19,12 +19,14 @@ Instead of relying on complex vector databases (Vectorless RAG), every AI agent 
 │   ├── progress.md         ← session log (append-only)
 │   ├── schema/db.md        ← database schema
 │   ├── api/endpoints.md    ← API documentation
-│   └── connections.md      ← cross-project links
+│   ├── connections.md      ← cross-project links
+│   └── learnings.md        ← project-specific lessons (append-only)
 ├── letx/
 │   └── ...
 └── _global/
     ├── integrations.md     ← how all projects connect
-    └── tech-decisions.md   ← cross-project decisions
+    ├── tech-decisions.md   ← cross-project decisions
+    └── learnings.md        ← reusable gotchas, patterns, insights
 ```
 
 Every write is a **git commit** with a descriptive message. Full history, diffs, rollback.
@@ -57,6 +59,8 @@ Installs to all major AI agent paths automatically:
 | `/ck schema <project>` | Save DB schema or API spec |
 | `/ck progress <project>` | Append to progress log |
 | `/ck link <a> <b>` | Record cross-project connection |
+| `/ck learn "<text>" [project]` | Capture a gotcha/pattern/pitfall/insight/idea |
+| `/ck learnings [project]` | Recall saved learnings into context |
 | `/ck status` | List all tracked projects |
 | `/ck search <query>` | Full-text search across the store |
 | `/ck sync` | Git commit all pending changes |

@@ -7,12 +7,14 @@ description: >
   Cross-platform (macOS, Linux, Windows). Works offline. Readable by any AI agent.
 license: MIT
 user-invocable: true
-argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | status | search <query> | sync'
+argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | learn <text> [project] [--type <t>] [--tags <csv>] | learnings [project] [--tag <t>] | status | search <query> | sync'
 when_to_use: >
   Use when user says: /ck, /common-knowledge, save to common knowledge, load project
   context, update knowledge store, what do I know about X, ck init, ck save, ck load,
-  ck status, ck search, ck map, ck schema, ck progress, ck sync, ck link,
-  add this to my knowledge base, store this for later, remember this project.
+  ck status, ck search, ck map, ck schema, ck progress, ck sync, ck link, ck learn,
+  ck learnings, add this to my knowledge base, store this for later, remember this
+  project, remember this lesson, save this learning, log a gotcha, note this pitfall,
+  capture this insight, what have I learned about X, recall lessons.
 metadata:
   author: shihabshahrier
   category: knowledge-management
@@ -31,6 +33,8 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
 | `schema <project>` | Save DB schema or API spec |
 | `progress <project>` | Append a timestamped entry to the progress log |
 | `link <project-a> <project-b> [--type <rel>]` | Record a cross-project connection |
+| `learn <text> [project] [--type <t>] [--tags <csv>]` | Capture a gotcha/pattern/pitfall/insight/idea (global by default, or scoped to a project) |
+| `learnings [project] [--tag <t>]` | Recall saved learnings into context |
 | `status` | List all tracked projects with status |
 | `search <query>` | Full-text search across the entire store |
 | `sync` | Git commit all pending uncommitted changes |
@@ -51,6 +55,8 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
    - `save`, `map`, `schema`, `progress` (without project slug, or with `--auto`) → Phase 2, then Phase 3
    - `save`, `map`, `schema`, `progress` (with explicit project slug) → Phase 3
    - `link` → Phase 3E (both project slugs required; if missing, prompt)
+   - `learn` → Phase 3F
+   - `learnings` → Phase 4L
    - `load` → Phase 4
    - `status` → Phase 5
    - `search` → Phase 6
@@ -117,7 +123,7 @@ When `--auto` is present OR user did not provide a project slug:
 
 ---
 
-## Phase 3 — Save / Map / Schema / Progress / Link
+## Phase 3 — Save / Map / Schema / Progress / Link / Learn
 
 Load `references/section-templates.md` before writing any files.
 
@@ -189,6 +195,24 @@ Append a new timestamped entry to `$CK_HOME/<project>/progress.md`.
 5. Update `meta.json.related_projects` for both projects: add the other project's slug if not already present.
 6. Commit: `"feat: link <project-a> <-> <project-b> [<type>]"`
 
+### 3F — learn (capture a reusable lesson)
+
+A learning is a gotcha you got stuck on and resolved, a creative idea, a pattern, a pitfall to avoid, or an insight for future decision-making — knowledge that outlives a single session.
+
+1. Compose the entry from the conversation:
+   - **title** — one short line.
+   - **type** — one of `gotcha | pattern | pitfall | insight | idea` (default `insight`).
+   - **tags** — comma-separated keywords for later filtering (e.g. `postgres,pooling`).
+   - **body** — structured prose: `**Context:**` (where stuck / the situation), `**Resolution/Insight:**` (what solved it / the idea), `**Why it matters:**` (future application).
+2. Scope: **global by default** (`_global/learnings.md`) since most lessons are reusable. If the user names a project, or the lesson is clearly project-specific, scope it to `<project>/learnings.md`.
+3. **Preferred:** persist deterministically with the bundled helper (it creates the header if new, appends, and commits):
+   ```bash
+   bash scripts/ck-learn.sh --home "$CK_HOME" [--project <slug>] \
+     --type <type> --tags "<csv>" --title "<title>" --body "<body>"
+   ```
+   If the script is not reachable, append the entry inline to the target `learnings.md` (append-only — never overwrite) using the learnings template in `references/section-templates.md`, then commit.
+4. Commit: `"feat(<project|global>): capture learning — <title> [learning]"`
+
 ---
 
 ## Phase 4 — Load
@@ -200,6 +224,7 @@ Append a new timestamped entry to `$CK_HOME/<project>/progress.md`.
    - `progress.md` (last 60 lines only — use `tail`)
    - `decisions.md`
    - `connections.md`
+   - `learnings.md` (project-specific lessons, if present)
    - `schema/db.md` (if `--section schema` or `--section db`)
    - `api/endpoints.md` (if `--section api`)
    - `frontend/components.md` (if `--section frontend`)
@@ -207,6 +232,22 @@ Append a new timestamped entry to `$CK_HOME/<project>/progress.md`.
    - `workers/overview.md` (if `--section workers`)
 3. Output: a structured summary of everything loaded.
 4. Print: "Local path: {local_path}" and "Repo: {origin_repo}" so the agent knows where to find code.
+
+---
+
+## Phase 4L — Learnings (recall)
+
+Surface saved lessons so they inform the current decision.
+
+1. Determine scope:
+   - `learnings` (no project) → read `$CK_HOME/_global/learnings.md`.
+   - `learnings <project>` → read `$CK_HOME/<project>/learnings.md` **and** `_global/learnings.md`.
+2. If `--tag <t>` is given, filter to entries whose `**Tags:**` line contains `<t>` (use search):
+   ```bash
+   bash scripts/ck-search.sh "<t>" "$CK_HOME"
+   ```
+3. Output: each learning as `date — title [type]` with its Context / Resolution / Why-it-matters. Newest first when summarizing.
+4. Read-only — no commit.
 
 ---
 
@@ -313,6 +354,6 @@ If git is not available: omit commit line and warn "git not found — changes sa
 - Git commands: always use `-C "$CK_HOME"` flag to avoid working directory confusion.
 - Windows paths: replace forward slashes with backslashes; use `%USERPROFILE%` not `$HOME`.
 - Slug sanitization: `^[a-z0-9]+(-[a-z0-9]+)*$` — enforce before creating any project directory.
-- Never overwrite `progress.md` — always append. Never overwrite `connections.md` — always append.
+- Never overwrite `progress.md`, `connections.md`, or `learnings.md` — always append.
 - If git commit fails (nothing to commit), continue without error.
 - All Markdown files: valid heading structure, no unclosed code fences, no broken tables.

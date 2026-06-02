@@ -181,6 +181,43 @@ Cross-project links and integration points.
 
 ---
 
+## learnings.md
+
+Append a new entry for each learning. Never overwrite existing entries.
+Lives at `{project}/learnings.md` (project-specific) or `_global/learnings.md` (reusable, default).
+Written by `/ck learn`, recalled by `/ck learnings`.
+
+```markdown
+# Learnings — {Global | Project Name}
+
+Append-only log of gotchas, fixes, patterns, and insights captured for future
+decision-making. Newest entries at the bottom. Recall with `/ck learnings`.
+
+---
+
+## {YYYY-MM-DD} — {short title}
+
+> **Type:** {gotcha | pattern | pitfall | insight | idea}  |  **Tags:** {comma,separated,keywords}  |  **Project:** {slug or —}
+
+**Context:** {where you got stuck / the situation / what prompted this}
+**Resolution/Insight:** {what fixed it / the creative idea / the pattern}
+**Why it matters:** {how this should inform a future decision}
+
+---
+```
+
+### Type vocabulary
+
+| Type | Use for |
+|------|---------|
+| `gotcha` | A non-obvious trap you hit and resolved (env, config, API quirk) |
+| `pattern` | A reusable approach worth repeating |
+| `pitfall` | Something to avoid — a path that wasted time |
+| `insight` | A realization that changes how you decide (default) |
+| `idea` | A creative idea to revisit later |
+
+---
+
 ## schema/db.md
 
 ````markdown
