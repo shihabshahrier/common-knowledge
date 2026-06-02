@@ -167,6 +167,7 @@ Update `meta.json` field `last_updated` to current UTC time.
     --id <stable-id> --file <relpath> --summary "<one line>" \
     --tags "<csv>" --importance critical|normal --no-commit
   ```
+- **catalog** — refresh this project's rollup entry (O(1)) so `status`/discovery stay current: `bash scripts/ck-status.sh --home "$CK_HOME" --project <slug> --no-commit`.
 
 Commit (one commit for the batch):
 ```bash
@@ -287,15 +288,13 @@ Surface saved lessons so they inform the current decision.
 
 ## Phase 5 — Status
 
-1. List all subdirectories in `$CK_HOME/` excluding `_global` and `.git`.
-2. For each dir: read `meta.json` → extract name, type, status, last_updated, description.
-3. Print table:
+Run the rollup helper — it builds `_global/catalog.json` (machine rollup), regenerates the README index, prints a compact table, and commits:
 
-   | Project | Type | Status | Last Updated | Description |
-   |---------|------|--------|-------------|-------------|
+```bash
+bash scripts/ck-status.sh --home "$CK_HOME"
+```
 
-4. Regenerate `$CK_HOME/README.md` with the project index table.
-5. If README changed, commit: `"chore: update project index"`.
+**Read its printed table** (one cheap read) — do **not** open every project's `meta.json`; at 100 projects that costs ~8k tokens vs ~2k for the table. Use `--project <slug>` for an O(1) incremental catalog update after a single save.
 
 ---
 
@@ -303,11 +302,13 @@ Surface saved lessons so they inform the current decision.
 
 Load `references/git-conventions.md` only if constructing a commit after search produces results that should be saved.
 
-**Preferred:** run the bundled helper — it groups by project, shows `meta.json` descriptions, and caps results:
+**Preferred:** run the bundled helper — it groups by project, caps **per project** (so no project is silently dropped at scale), and flags overflow:
 
 ```bash
-bash scripts/ck-search.sh "$QUERY" "$CK_HOME"
+bash scripts/ck-search.sh "$QUERY" --home "$CK_HOME" [--per-project N]
 ```
+
+At many projects, search the cheap discovery layer first: `--manifest` greps only `catalog.json` + each `index.json`/`brief.md` to find *which* projects are relevant (~1k tokens), then `/ck load` those. This is the store-level twin of Phase 4's two-stage load.
 
 If the script is not reachable, run inline (this MUST match `scripts/ck-search.sh`):
 

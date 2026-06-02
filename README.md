@@ -73,6 +73,15 @@ Installs to all major AI agent paths automatically:
 
 The raw file is **never** committed — the agent summarizes the extracted text into `codebase-map.md` / `decisions.md` / `learnings.md` and records a source pointer (path + sha256) in `meta.json`.
 
+## Scales to 100s of projects
+
+Retrieval stays token-cheap as the store grows:
+- **`/ck status`** reads one rollup (`_global/catalog.json`) + prints a compact table — ~2k tokens at 100 projects, not ~8k from opening every `meta.json`.
+- **`/ck search`** caps results **per project** (never silently drops a project) and offers **`--manifest`** mode for ~1k-token cross-repo discovery, then `/ck load` only the relevant ones.
+- **`/ck load`** is always single-project, two-stage (brief → manifest → critical-first), so per-load cost is flat regardless of store size.
+
+Benchmarked at 100 projects (5 MB store): search 88 ms, status 59 ms, recall 53 ms.
+
 ## Autonomy (optional)
 
 By default the store is trigger-driven — you (or the agent) invoke `/ck`. Opt into passive autonomy with deterministic Claude Code hooks:

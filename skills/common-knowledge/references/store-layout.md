@@ -29,7 +29,8 @@ $CK_HOME/                             ← Git root (e.g. ~/common-knowledge)
 │   ├── agent-config.md               ← AI agent keys, model preferences, environment notes
 │   ├── tech-decisions.md             ← Architecture decisions spanning all projects
 │   ├── integrations.md               ← How projects connect (summary of all connections.md)
-│   └── learnings.md                  ← Reusable gotchas, patterns, insights (append-only)
+│   ├── learnings.md                  ← Reusable gotchas, patterns, insights (append-only)
+│   └── catalog.json                  ← Store rollup: 1 entry/project (status, stack, tags, critical-count)
 │
 └── {project-slug}/                   ← One directory per project (kebab-case slug)
     ├── meta.json                     ← Machine-readable project metadata (REQUIRED)
@@ -201,6 +202,7 @@ Description: Marketing automation and indexing platform.
 | `infra/overview.md` | Agents | `/ck save --section infra` | Cloud infra, env vars, costs. |
 | `workers/overview.md` | Agents | `/ck save --section workers` | Background jobs and queues. |
 | `_global/integrations.md` | Agents | `/ck link` | Cross-project integration map. |
+| `_global/catalog.json` | Agents (machine) | `/ck status`, `/ck save` | Store rollup for cheap status + cross-project discovery. Rebuilt/upserted by `ck-status.sh`. |
 | `_global/learnings.md` | Agents, Humans | `/ck learn` | Reusable gotchas/patterns/insights. Append only. |
 | `_global/tech-decisions.md` | Agents, Humans | Manual | Architecture decisions spanning all projects. |
 | `_global/agent-config.md` | Agents | Manual | AI agent keys, model preferences. |

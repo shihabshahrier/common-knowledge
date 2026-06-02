@@ -94,7 +94,7 @@ chore: sync knowledge store 2026-06-02T03:15Z
 | `ingest <file>` | `feat(<project>): ingest <filename> [ingest]` |
 | `brief <project>` | `docs(<project>): refresh brief [brief]` |
 | index upsert | `chore(<project>): index <id> [index]` |
-| `status` | `chore: update project index` |
+| `status` | `chore: update catalog + project index` |
 | `sync` | `chore: sync knowledge store YYYY-MM-DDTHH:MMZ` |
 
 ---

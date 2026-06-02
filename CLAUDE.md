@@ -7,7 +7,7 @@ for AI agents. It installs to all major agent paths via `bash install.sh`.
 
 ## Source of Truth
 
-- **Edit only:** `skills/common-knowledge/` — `SKILL.md`, `references/`, and `scripts/` (bundled scripts (`ck-init`, `ck-search`, `ck-learn`, `ck-recall`, `ck-autosync`, `ck-ingest`, `ck-index`)).
+- **Edit only:** `skills/common-knowledge/` — `SKILL.md`, `references/`, and `scripts/` (bundled scripts (`ck-init`, `ck-search`, `ck-learn`, `ck-recall`, `ck-autosync`, `ck-ingest`, `ck-index`, `ck-status`)).
 - **Generated (do not edit directly):** `.cursor/rules/`, `.windsurf/rules/`, `.clinerules/`, agents/
 - After editing the skill, run `bash install.sh` to propagate to all agent paths.
 - Scripts are the deterministic source of truth for init + search. Change inline bash in `SKILL.md` → change the matching script too. They must not drift.
