@@ -158,20 +158,20 @@ git -C "$CK_HOME" commit -m "feat(<project>): save session context [<section>]"
 Generate `$CK_HOME/<project>/codebase-map.md`:
 - If `local_path` in `meta.json`: note the actual directory structure (describe from context or cwd listing).
 - Include: entry points, key files, architectural layers, tech stack, module boundaries.
-- Commit: `"docs(<project>): update codebase map"`
+- Commit: `"docs(<project>): update codebase map [map]"`
 
 ### 3C — schema
 
 Determine subsection from content:
 - Database schema → write `$CK_HOME/<project>/schema/db.md` + `schema/db.sql` (if SQL available)
 - API spec → write `$CK_HOME/<project>/api/endpoints.md` + `api/openapi.yaml` (if spec available)
-- Commit: `"docs(<project>): update <db|api> schema"`
+- Commit: `"docs(<project>): update db schema [schema]"` or `"docs(<project>): update api endpoints [api]"`
 
 ### 3D — progress
 
 Append a new timestamped entry to `$CK_HOME/<project>/progress.md`.
 - Use the session-completed items as the content.
-- Commit: `"chore(<project>): log progress $(date -u +%Y-%m-%d)"`
+- Commit: `"chore(<project>): log progress $(date -u +%Y-%m-%d) [progress]"`
 
 ### 3E — link
 
@@ -302,7 +302,7 @@ If git is not available: omit commit line and warn "git not found — changes sa
 - Load `references/git-conventions.md` only when constructing a non-standard commit message.
 - Never load all references at once — load lazily per phase.
 - For `load`: read files sequentially; stop reading if context window nears limit (>100k tokens used).
-- For `search`: return at most 20 matches per file, 50 matches total.
+- For `search`: cap at 50 matches total (`head -50`); refine the query if capped.
 
 ---
 
