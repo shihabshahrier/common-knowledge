@@ -174,3 +174,7 @@ MIT — see [LICENSE](LICENSE).
 
 *Part of the [Context-Heavy](https://github.com/shihabshahrier/Context-Heavy) ecosystem.
 The local-first, offline complement to the hosted knowledge graph.*
+
+---
+
+📖 **Project page:** https://shihub.online/projects/common-knowledge
