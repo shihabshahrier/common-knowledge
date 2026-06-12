@@ -7,7 +7,7 @@ description: >
   Cross-platform (macOS, Linux, Windows). Works offline. Readable by any AI agent.
 license: MIT
 user-invocable: true
-argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | learn <text> [project] [--type <t>] [--tags <csv>] | learnings [project] [--tag <t>] | ingest <file> [project] | brief <project> | status | search <query> | sync'
+argument-hint: 'init | save <project> [--section <area>] [--auto] | load <project> | map <project> | schema <project> | progress <project> | link <a> <b> [--type <rel>] | learn <text> [project] [--type <t>] [--tags <csv>] | learnings [project] [--tag <t>] | ingest <file> [project] | brief <project> | status | search <query> | sync | cloud connect --url <u> --key <k> | push [project|--all] [--changed] [--dry-run] | pull [project] | cloud status'
 when_to_use: >
   Use when user says: /ck, /common-knowledge, save to common knowledge, load project
   context, update knowledge store, what do I know about X, ck init, ck save, ck load,
@@ -16,7 +16,9 @@ when_to_use: >
   project, remember this lesson, save this learning, log a gotcha, note this pitfall,
   capture this insight, what have I learned about X, recall lessons, ck ingest,
   ingest this pdf, import this document, extract this csv/docx/pptx/xlsx, read
-  this file into knowledge, summarize this document into the store.
+  this file into knowledge, summarize this document into the store, ck push,
+  ck pull, ck cloud, push to cloud brain, pull from cloud brain, sync with
+  context heavy, connect to context heavy, catch up from the cloud.
 metadata:
   author: shihabshahrier
   category: knowledge-management
@@ -42,6 +44,10 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
 | `status` | List all tracked projects with status |
 | `search <query>` | Full-text search across the entire store |
 | `sync` | Git commit all pending uncommitted changes |
+| `cloud connect --url <u> --key <k> [--agent <name>] [--auto-pull] [--auto-push]` | Configure the Context-Heavy cloud bridge |
+| `push [<project>] [--all] [--changed] [--dry-run]` | Push project knowledge to the cloud brain (idempotent) |
+| `pull [<project>] [--agent <name>]` | Pull cloud context (persona + pinned + lessons) into the session — read-only |
+| `cloud status` | Show bridge config + last-push markers |
 
 ---
 
@@ -67,6 +73,7 @@ Maintain a Git-backed local knowledge store shared by every AI agent, codebase, 
    - `status` → Phase 5
    - `search` → Phase 6
    - `sync` → Phase 7
+   - `cloud`, `push`, `pull` → Phase 9
 
 ---
 
@@ -358,14 +365,42 @@ If git is not available: omit commit line and warn "git not found — changes sa
 
 ---
 
+## Phase 9 — Cloud Bridge (Context-Heavy)
+
+Load `references/cloud-bridge.md` for the config format, payload mapping, and autonomy matrix.
+
+The store stays local-first; the bridge adds an optional cloud brain ([Context-Heavy](https://github.com/shihabshahrier/Context-Heavy)) where pushed knowledge becomes hybrid-searchable, graph-linked, and shared across agents and machines. All cloud commands run the deterministic helper:
+
+- **`cloud connect`** — store URL + API key (gitignored, `chmod 600`) and autonomy flags:
+  ```bash
+  bash scripts/ck-cloud.sh connect --url "$CH_API_URL" --key "$CH_API_KEY" \
+    [--agent <name>] [--auto-pull] [--auto-push]
+  ```
+- **`push`** — send a project (or `--all`) to `POST /v1/sync/ck`. Sections, learnings (project + global), and connections map to nodes and edges; the server is idempotent by slug, so re-push never duplicates. `--changed` skips projects already pushed at their current commit; `--dry-run` shows what would be sent:
+  ```bash
+  bash scripts/ck-cloud.sh push <project> [--all] [--changed] [--dry-run]
+  ```
+- **`pull`** — fetch the cloud warm-start (persona to adopt + pinned nodes + lessons, exposure-filtered per (project, agent) context profile) and recent learnings, and print them into the session. **Read-only: never writes store files.** After running it, actually adopt the persona behavior and weigh the lessons:
+  ```bash
+  bash scripts/ck-cloud.sh pull [<project>] [--agent <name>]
+  ```
+- **`cloud status`** — show config (key masked) + per-project last-push markers:
+  ```bash
+  bash scripts/ck-cloud.sh status
+  ```
+
+If the script is unreachable, do not improvise HTTP calls inline — report that the bridge helper is missing and where it should be.
+
+---
+
 ## Autonomy (optional hooks)
 
 The store is trigger-driven by default. Two **deterministic, opt-in** Claude Code hooks add passive autonomy (wire them with `bash install.sh --hooks`):
 
-- **SessionStart → `scripts/ck-recall.sh`** — detects the project from cwd; if the store has knowledge for it, injects its lessons (`learnings.md`), `_global` lesson titles, meta, and recent progress so the session starts warm. Silent when no match.
-- **SessionEnd → `scripts/ck-autosync.sh`** — commits any uncommitted store changes so nothing written during the session is lost. Silent when clean.
+- **SessionStart → `scripts/ck-recall.sh`** — detects the project from cwd; if the store has knowledge for it, injects its lessons (`learnings.md`), `_global` lesson titles, meta, and recent progress so the session starts warm. Silent when no match. With `CH_AUTO_PULL=true` in the cloud config it also pulls the cloud warm-start (persona + lessons from other agents/machines) — even when the local store is empty for the project, so a fresh machine catches up automatically.
+- **SessionEnd → `scripts/ck-autosync.sh`** — commits any uncommitted store changes so nothing written during the session is lost. Silent when clean. With `CH_AUTO_PUSH=true` it then pushes changed projects to the cloud brain so other agents can catch up with this session's knowledge.
 
-Capture stays agent-driven: hooks cannot compose a learning. When a session resolves a gotcha, finds a pattern, or makes a notable decision, proactively run `/ck learn` or `/ck save` for it.
+Both cloud legs are best-effort: a dead network never blocks session start/end. Capture stays agent-driven: hooks cannot compose a learning. When a session resolves a gotcha, finds a pattern, or makes a notable decision, proactively run `/ck learn` or `/ck save` for it.
 
 ---
 
@@ -387,6 +422,7 @@ Capture stays agent-driven: hooks cannot compose a learning. When a session reso
 - Load `references/store-layout.md` only in Phase 1 and Phase 3 (when meta.json is needed).
 - Load `references/section-templates.md` only at the start of Phase 3.
 - Load `references/git-conventions.md` only when constructing a non-standard commit message.
+- Load `references/cloud-bridge.md` only in Phase 9 (cloud/push/pull).
 - Never load all references at once — load lazily per phase.
 - For `load`: read files sequentially; stop reading if context window nears limit (>100k tokens used).
 - For `search`: cap at 50 matches total (`head -50`); refine the query if capped.

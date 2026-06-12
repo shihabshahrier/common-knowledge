@@ -105,6 +105,7 @@ echo "  /ck load <project>          — load project knowledge into context"
 echo "  /ck learn \"<text>\"          — capture a gotcha/insight/idea"
 echo "  /ck status                  — list all tracked projects"
 echo "  /ck search <query>          — search across the store"
+echo "  /ck cloud connect …         — optional: bridge to a Context-Heavy cloud brain"
 echo ""
 if [[ "$WITH_HOOKS" -eq 0 ]]; then
   echo "Autonomy (optional): bash install.sh --hooks"

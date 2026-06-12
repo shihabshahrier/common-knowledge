@@ -29,6 +29,8 @@ Thumbs.db
 *.bak
 .env
 .env.local
+.cloud
+.cloud-state.json
 EOF
 
 # ─── .gitattributes (cross-platform line endings) ─────────────────────────────

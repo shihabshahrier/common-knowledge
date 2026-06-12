@@ -66,6 +66,10 @@ Installs to all major AI agent paths automatically:
 | `/ck status` | List all tracked projects |
 | `/ck search <query>` | Full-text search across the store |
 | `/ck sync` | Git commit all pending changes |
+| `/ck cloud connect --url <u> --key <k>` | Configure the optional Context-Heavy cloud bridge |
+| `/ck push [project\|--all] [--changed] [--dry-run]` | Push knowledge to the cloud brain (idempotent) |
+| `/ck pull [project]` | Pull cloud context (persona + lessons) into the session — read-only |
+| `/ck cloud status` | Show bridge config + last-push markers |
 
 ## Ingest documents
 
@@ -95,6 +99,26 @@ bash install.sh --hooks   # backs up ~/.claude/settings.json first, idempotent
 
 Capture stays agent-driven (hooks can't compose a lesson) — the agent runs `/ck learn` / `/ck save` when something is worth remembering.
 
+## Cloud bridge (optional) — Context-Heavy
+
+The store is local-first and stays that way: everything above works offline with zero accounts. Optionally, it can also sync with **Context-Heavy** — a cloud brain (currently in development) that makes pushed knowledge hybrid-searchable (full-text + vector), graph-linked, temporally versioned, and shared across agents and machines.
+
+```bash
+# point the bridge at any Context-Heavy deployment — including localhost
+/ck cloud connect --url http://localhost:8080 --key cg_live_... --agent claude-code
+
+/ck push my-project --dry-run    # see what would be sent
+/ck push my-project              # sections + learnings + connections → cloud graph
+/ck pull my-project              # persona + pinned nodes + lessons → into context
+```
+
+- **Identity = API key.** A `cg_live_…` key belongs to one Context-Heavy workspace; everything you push and pull is scoped to that workspace. The key lives in `$CK_HOME/.cloud` (gitignored, `chmod 600`) — never in the repo.
+- **Push is idempotent** — re-pushing an unchanged project is a no-op on the server.
+- **Pull is read-only** — it prints context for the agent; it never writes store files.
+- **Autonomy, opt-in:** `connect --auto-pull --auto-push` makes the SessionStart hook catch the agent up from the cloud (even on a fresh machine with an empty store) and the SessionEnd hook push changed projects — so any agent can catch up with you, and you with them. Both legs are best-effort: no network, no noise.
+
+Without a `.cloud` config the bridge is completely inert — nothing changes for local-only users.
+
 ## How It Works
 
 ```
@@ -107,6 +131,7 @@ Phase 5 → Status (list projects, regenerate index)
 Phase 6 → Search (grep across all files)
 Phase 7 → Sync (git commit pending changes)
 Phase 8 → Report (always: files changed + commit hash)
+Phase 9 → Cloud bridge (connect / push / pull — optional)
 ```
 
 ## Platform Support
@@ -120,6 +145,7 @@ Phase 8 → Report (always: files changed + commit hash)
 ## Requirements
 
 - **git** — for version control (optional but strongly recommended)
+- **curl + python3** — only for the optional cloud bridge (`/ck push`/`pull`)
 - Any AI agent supporting the [Agent Skills open standard](https://github.com/agent-skills)
 
 ## Agent Support
